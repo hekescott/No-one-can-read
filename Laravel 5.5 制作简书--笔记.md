@@ -231,6 +231,9 @@ Schema::create('posts', function(Blueprint $table) {
 ### 2.6 make:model
 
 ```php
-php artisan make:model demo -mrc
+php artisan make:model Demo -mrc
 ```
 
+这是一个比较变态的命令，就目前来说，完全满足我的小需求。
+
+注意Demo，而不是demo，一定要首字母大写哦
