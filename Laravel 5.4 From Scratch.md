@@ -2,7 +2,7 @@
 
 > Jerrey Way.官方推荐教程！你说牛不牛，可惜咱英文实在不行，要不然肯定以这个为主了。现在综合学习，循环滚动，把laravel MVC掌握了再说。
 
-## 06.QueryBuilder
+## 06_QueryBuilder
 
 > QueryBuilder:数据库请求构建器
 >
@@ -12,7 +12,7 @@
 
 他就是提供了一个数据库`CRUD`的接口，对数据库进行操作。
 
-### 06.1 创建一个Task数据表
+### _1 创建一个Task数据表
 
 要求
 
@@ -55,7 +55,7 @@
 
 Task1达成！
 
-### 06.2 获取这个Task表的数据，并输出显示
+### _2 获取这个Task表的数据，并输出显示
 
 ```php
 // 把数据表中的数据 传值给tasks变量
@@ -68,15 +68,15 @@ dd($task);
 return view('tasks.show',compact('task'));
 ```
 
-###06.3 通过网址绑定show和index 
+###_3 通过网址绑定show和index 
 
 ```html
 <a href="/tasks/{{ $task->id }}"></a>
 ```
 
-## 07.Eloquent 
+## 07_Eloquent 
 
-###07.1 简写DB
+###_1 简写DB
 
 ```php
 $tasks=DB::table('tasks')->get();
@@ -95,7 +95,7 @@ $tasks = Task:all();
 
 Task1 完成！
 
-###07.2 tinker 基础用法
+###_2 tinker 基础用法
 
 ```bash
 rem cmder中user-alias.cmd中设置
@@ -125,7 +125,7 @@ Task2 完成！！
 
 
 
-###07.3 非破坏性的增加和移除数据表column
+###_3 非破坏性的增加和移除数据表column
 
 系统自带命令:有个小缺点 posts table需要反复输入，优雅吗，一点都不优雅
 
@@ -168,7 +168,7 @@ $table->boolean('completed')->default(false)->change();
  
 ```
 
-#### 07.3.1 generator适用场景
+#### _3_1 generator适用场景
 
 ```php
 // 好吧 在经历了一段辛苦又蛋疼还没有成效的search之后 2018.01.15 进行盖棺定论
@@ -184,7 +184,110 @@ $table->boolean('completed')->default(false)->change();
 
 ```
 
+### _4 获取所有的completed数据
+
+```php
+// 01 Tinker命令
+App\Task::where('completed',0)->get();
+
+// 02 给Task添加方法
+public static function incompleted(){
+  return stati::where('completed',0)->get();
+}
+
+// 添加方法之后，Tinker中可以这样调用
+App\Task::incompleted()
+
+// 03 同样给Task添加方法
+public function scopeIncomplete($query){
+  return $query->where('completed',0);
+}
+
+// 邪门？放着好好的方法2不用，还要搞这么复杂的方法3
+// too young!这个是为了代码的重用性，这个零件是多功能的，牛不牛
+
+//添加方法后，Tinker中可以这样调用
+App\Task::incomplete()
+// 拿到数据之后，可以->get 不仅如此还可以->where('completed','>',3)->get()
+App\Task::incomplete()->get()
+App\Task::incomplete()->where('completed','>',3)->get()
+
+// 写在最后，优雅的Tinker
+// 每次都输入App\Task好烦，试试直接输入Task试试，是不是瞬间舒畅不少呢？
+[!] Aliasing 'Task' to 'App\Task' for this Tinker session.
+// 优雅、舒服！
+```
+
 
 
 > Eloquent 是 Laravel 的 'ORM'，即 'Object Relational Mapping'，对象关系映射。ORM 的出现是为了帮我们把对数据库的操作变得更加地方便。
+
+## 08_Controller
+
+### _1 路由做路由的事情
+
+```php
+// Controller的意义就是接受Route的分发
+
+Route::get('/tasks',function(){
+  $tasks = Task::all();
+  return view('tasks.index',compact('task'));
+})
+  
+// 引入Controller之后，就在TasksController文件中加入
+  use App\Task;
+  
+  public function index(){
+  $tasks = Task::all();
+  return view('tasks.index',compact('tasks'));
+}
+
+// 原先的路由写为
+Route::get('/tasks','TasksController@index');
+
+// 注意，这里官方自动生成的Controller是不带复数的，比如TaskController
+// 而JerreyWay教程中是生成带复数的Controller 还有一个5.5 step by step也是复数，但是
+
+// 在细细考察了几个教程之后，这些作者的Controller写法，大部分都不带复数
+
+// 我是这样理解的，这是一个类，比如Model:Task.php, Controller也属于类 所以应该是TaskController
+// 复数代表一个集合，比如数据表 tasks，比如Tasks的view文件夹，在比如显示Task的index的网址，肯定也是/tasks，在mig中，创建数据库版本控制，是对tasks的控制，所以也是create_tasks_table
+
+// 还有个大小写的问题
+// 同理，类就要大写，比如Task.php, TaskController.php
+// 其他都是小写
+// 复数+小写，单数+大写，大致是这样，没有系统论证，咱们走着瞧
+```
+
+同理，把tasks.show转换为Controller控制。
+
+// 别忘了分号，以及注意拼写，都错了好多次了
+
+
+
+## 09_Route Model Binding
+
+### _1 show($id)简写   
+
+```php
+public function show($id){
+  $task = Task::find($id);
+  return view('tasks.show',compact('task'));
+}
+
+简写为
+  public function show(Task $task){
+  return view('tasks.show',compact('task'));
+}
+
+// 干的漂亮，能简写就简写，能优雅就优雅，能优化就优化
+// 注意function(a b c) 不带逗号 和 Javascript的不一样 function(a,b,c) 又简写了
+// 还有一个需要明白，Task $task这个是固定组合，比如User $user,这是必须滴，
+// 想省事，就得守规矩，明白了吗？
+
+```
+
+##10_Layout and Structure
+
+### _1创建模版 layout
 
