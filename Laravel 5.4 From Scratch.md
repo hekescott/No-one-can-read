@@ -289,5 +289,98 @@ public function show($id){
 
 ##10_Layout and Structure
 
-### _1创建模版 layout
+### _1 创建模版 layout
+
+主文件main
+
+```html
+// layout.blade.php 这个一般都是主文件模版
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Application</title>
+  </head>
+  <body>
+    <!--意思是content插入到这里-->
+    <div class="container">
+      @yield('content')
+    </div>
+    @yield('footer')
+  </body> 
+</html>
+```
+
+分文件
+
+```blade.php
+@extents('layout')
+
+@section('content')
+abcdefg
+@endsection
+
+@section('footer')
+<script src="xxxx.js"></script>
+@endsection
+```
+
+以上是简单的应用，随便测试一下
+
+### _2 模版实战
+
+[Bootstrap的album模版](http://v4-alpha.getbootstrap.com/examples/album/)
+
+复制源代码到项目中，更换js 和css链接，JS使用官方cdn，
+
+css则落实到本地的`public>css`中
+
+```html
+<!--Jeffrey Way的做法-->
+<link href="/css/album.css" rel="stylesheet">
+
+<!--我自己的做法-->
+<link href-"css/album.css" rel="stylesheet">
+
+<!--注意css要放在 public的css下 切记-->
+```
+
+```html
+<!--主页引入部件-->
+@include('layouts.nav')  
+```
+
+> 同样是引入 include 和 yield有啥区别呢？
+>
+> * include 是传统的调用，是Main-part，需要用到Main view（‘main’）
+> * 而yield 则不是传统调用，是Part+通用，view（'part'）
+> * include 单个调用，也yield是要和extends配合的
+
+
+
+````php
+// 假设我们现在有view A(通用/全局) 和 B（局部/local）
+// 同时假设，我们还有Part C D E F
+
+// 如果展示A，但是A一般不是单独展示的，A+B的形式 
+@include C
+@include D
+@include E
+@include F
+  
+// 如果展示B 默认是A+B
+
+// 在A中要写
+  @yield('content')
+  @yield('footer')
+// 在B中要写
+  @extends(A)
+  
+  @section('content')
+  @endsection
+
+// 这次你明白了吗，知道怎么用了么 
+入点是B，展示的是B+(A+C+D+E+F)
+  
+````
 
