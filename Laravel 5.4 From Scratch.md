@@ -342,6 +342,13 @@ css则落实到本地的`public>css`中
 <!--我自己的做法-->
 <link href-"css/album.css" rel="stylesheet">
 
+<!--我自己的做法显然是愚蠢的，-->
+在某些情况下会出bug，比如我刚才设置的blog，blog/create
+blog可以完美继承css
+但是blog/create 就不会继承css
+所以，只有"/css/album.css"
+这一种写法
+
 <!--注意css要放在 public的css下 切记-->
 ```
 
