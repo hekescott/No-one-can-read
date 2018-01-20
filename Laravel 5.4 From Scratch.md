@@ -395,6 +395,8 @@ blog可以完美继承css
 
 [5.3文档](https://d.laravel-china.org/docs/5.3/csrf)
 
+### _01 CSRF是啥
+
 ```c
 /* CSRF 是个啥?
 
@@ -425,6 +427,12 @@ blog可以完美继承css
 	
 	* 兄弟,我不想看到你第二次!
 	
+
+```
+
+###_02 store 方法进行保存
+
+```c
 /*  在store方法中输出 */
 	
     // web.php
@@ -435,7 +443,52 @@ blog可以完美继承css
 	// 输出数组中的项目
 	dd(request(['title','body']));
 
-/*  出现N个错误,终于上传了我的第一个数据,我是不是很菜啊
+
+// 代码如下
+
+	// 利用post模型,保存title和body
+
+	$post = new Post;
+	
+	$post->title = request('title');
+	$post->body = request('body');
+      
+    // save
+      
+    $post->save();
+
+	// 跳转
+	
+	return redirect('/');
+
+	// 精简代码
+
+		// post::create方法
+	
+		    Post::create([
+			  'title'=>request('title'),
+			  'body'=>request('body')
+			]);
+
+			// 继续精简
+				// 一行代码搞定
+				Post::create(request(['title','body']));
+
+  	    // post.php
+  
+  			class Post extends Model
+  			{
+  	
+  			// 可被填充
+   			protected $filled = ['title','body'];
+   
+  			// 不可被填充, 为空的时候, 有时候不失为一种巧妙的方法
+  			// 但是一般情况下,还是规规矩矩的来
+  			protected $guarded = []
+ 		    }
+
+/*  反思
+    * 出现N个错误,终于上传了我的第一个数据,我是不是很菜啊
 	
 	* 匪夷所思的错误,title,我居然错写成titie,我是不是太有才了
 	
@@ -443,7 +496,7 @@ blog可以完美继承css
 	
 	* 结果还真我我搞错了
 	
-	* 起初我判断错误出现在 Post.php, protected属性
+	* 起初我判断错误出现在 Post.php, protected属性,发现没用,不过第二种方法可以哦
 	
 	* 犯了一个愚蠢的错误,命名不统一,一会blog,一会post,终于又搞错了
 	
@@ -452,5 +505,96 @@ blog可以完美继承css
 	* 还是规范好,省的到时候出错,另外看看sublime有没有项目管理插件
 ```
 
+### _03 复习
 
+``` c
+/*  还记得Tinker吗
+	
+	* 获取数据库数据
+	* App\Post::all()
+	* 可简写为 Post::all()
+
+```
+
+
+
+## 12_表单验证
+
+```c
+/*  为啥会有表单验证
+	
+	* 前端页面,就相当于一个前台服务员,酒店前台
+	
+	* 后端数据库,就相当于房客,符合条件才能住进来
+	
+	* 这就需要前台服务员对客户进行甄别了,
+	
+	* 没钱,不好意思,没身份证,不好意思, 
+    
+    * 前端页面就是干这个脏活的
+    
+    * 数据为空,不行,超出长度,不行,等等     *****/
+```
+
+
+
+### _01 最简单的表单验证(html)
+
+```c
+/*  最简单的表单验证
+	
+	* 很简单 
+	<input required>
+	<textarea required></textarea>
+	
+	* 输入不能为空
+```
+
+
+
+###_02 最简单的表单验证(store)
+
+```c
+/*	最简单的表单验证,不那么简单的实现方法
+	
+	* 不简单还实现他干什么啊.
+	
+	* 简单的功能少,不简单的功能多,当业务需求多时,请问我还有的选么? */
+	
+    $this->validate(request(),[
+    	'title'=> 'required',
+      	'body'=> 'required'
+    ]);
+	
+```
+
+### _03 Html提示信息展示
+
+```php
+// 如果有错误信息,则展示
+@if(count($errors))
+  
+<div class="form-group">
+  <div class="alert alert-danger">
+  	<ul>
+  	// 获取所有错误
+  	@foreach ($errors->all() as $error)
+  		<li>{{$error }}</li>
+  	@endforeach
+  	</ul>
+  </div>
+</div>
+
+@endif
+```
+
+## 13_输出展示博文
+
+```c
+/*	终于到输出和渲染啦,完成一个闭环
+
+	* 前面,做数据库的设置,
+	* 数据库的导入
+	* 现在该数据库输入啦
+```
 
