@@ -391,3 +391,66 @@ blog可以完美继承css
   
 ````
 
+## 11_CSRF 
+
+[5.3文档](https://d.laravel-china.org/docs/5.3/csrf)
+
+```c
+/* CSRF 是个啥?
+
+   * cross-site request forgery ??? 我了个去
+   
+   * 跨站请求伪造
+   
+   * Laravel 提供简单的方法保护你的应用不受到 跨站请求伪造 (CSRF) 攻击。
+   
+   * 跨站请求伪造是一种恶意的攻击，它利用已通过身份验证的用户身份来运行未经授权的命令。
+   
+   * 是不是很高端,很黑客,不过sorry,laravel在等你
+
+   * Laravel 会为每个活跃用户自动生成一个 CSRF "token" 。
+   
+   * 该 token 用来核实应用接收到的请求是通过身份验证的用户出于本意发送的。
+   
+/*  秘密武器:{{ csrf_field() }} 写法 */
+
+	<form method="POST" action="/profile">
+	    {{ csrf_field() }}
+	    ...
+	</form>
+	
+/*  如果忘记设置,就会出现TokenMismatchException
+
+	* verifyCsrToken line68
+	
+	* 兄弟,我不想看到你第二次!
+	
+/*  在store方法中输出 */
+	
+    // web.php
+    Route::post('/post/blog/create',BlogController@store);  
+
+	// BlogController.php @store 输出所有all()
+	dd(request()->all());
+	// 输出数组中的项目
+	dd(request(['title','body']));
+
+/*  出现N个错误,终于上传了我的第一个数据,我是不是很菜啊
+	
+	* 匪夷所思的错误,title,我居然错写成titie,我是不是太有才了
+	
+	* 每次都提示我说,找不到title,我说title就在那里啊,怎么找不到.
+	
+	* 结果还真我我搞错了
+	
+	* 起初我判断错误出现在 Post.php, protected属性
+	
+	* 犯了一个愚蠢的错误,命名不统一,一会blog,一会post,终于又搞错了
+	
+	* 主要是名字不统一的问题,这时候想念phpstorm了吧,因为phpstorm改名是可以自动更新的哦
+	
+	* 还是规范好,省的到时候出错,另外看看sublime有没有项目管理插件
+```
+
+
+
