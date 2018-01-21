@@ -598,3 +598,40 @@ blog可以完美继承css
 	* 现在该数据库输入啦
 ```
 
+## 15_Eloquent Relationships and comments
+
+> 关系模型绑定,以及评论系统
+
+```c
+/* 	Task1 生成Comments的Model Controller Migration */
+	
+	Model Comment -mrc
+	
+	* Comment 大写,单数,没忘记吧
+	
+/*  Task2 建立posts和comments的关系
+
+	* 啥关系啊,就是一篇博文,对应N个评论 1对多的关系 是一个从属关系
+	
+	* 睁大眼睛看看,一对多的从属关系怎么写哦  */
+	
+	
+	// in Post.php
+	
+	public function comments()
+    {
+      return $this->hasMany(Comment::class);
+    }
+		
+	// in Comment.php
+
+	public function post()
+    {
+      return $this->belongsTo(Post::class);
+    }
+	
+    /* Tips
+    
+       * 切记，Eloquent 会自动判断 Comment 模型上正确的外键字段。按约定来说，Eloquent 会取用自身		 * 模型的名称的「Snake Case」，并在后方加上 _id。所以，以此例来说，Eloquent 会假设 Comment 		  * 模型的外键是 post_id
+```
+
