@@ -140,6 +140,44 @@ public function register()
 	**/
 ```
 
+### _06 Github上传
+
+```c
+/*	Github Desktop
+
+	* 安装 git
+	
+	* git init
+	
+	* 把文件夹拖入即可
+	
+	* 注意git的repositories的名字 不能有汉字哦
+	
+	**/
+```
+
+### _07 Tips
+
+```c
+/*	提升开发效率(笔记本 14寸,超级本篇)
+
+	* 由于笔记本的屏幕偏小,性能较差
+	
+	* 所以选择IDE是不合算的,太卡,不流畅,这怎么能安心工作呢?
+	
+	* --->sublime Tex3 是最好的选择.
+	
+	* layout选择 横排*2,alt+shift+8,
+	
+	* 这是由于,很多代码需要各个文件进行关联对比
+	
+	* 比如web.php,和 controller的关联 
+
+***/
+```
+
+
+
 ## 01_MMCr设定
 
 > What is This?!
@@ -183,8 +221,89 @@ $table->string('title',100) 如何实现
 	* Controller -> PostController.php + restful
 	
 	* Migration -> create_posts_table -> migrate 
-
-
-
+	
+	**/
 ```
+
+## 02_V-blade
+
+>V: view层 展示层
+>
+>blade:laravel blade模版
+
+```c
+/*	一个简单的视图页居然折腾半天,不应该啊 
+	
+	* 不过也是值了,很有收获,好不好
+	
+	* 如果有模版,进行header footer 肢解的时候
+	
+	* 一定要在chrome中用f12的方法,进行肢解,方便
+	
+	**/
+```
+
+## 03_URL和view的关联
+
+```c
+/*	用户接触的View,是通过URL进行定位的
+
+	*  baidu.com 找的就是百度家,当然中间要经过域名定位等等工作
+	
+	*  baidu.com/accout 找的就是百度家的帐号,就是这样进行定位
+	
+	*  在后台,使用路由进行转接,为啥用路由呢,为了方便以后扩展
+	
+	*  url->路由->controller->view 最简单的了 四层
+	
+	**/
+
+
+/*  create方法写在前面,恶心的来了
+	
+	* posts/{post}
+	* posts/create
+	
+	* 如果是这样的顺序,优先识别create为{post}参数,进入post
+	
+	* 目前要这样写
+	
+	* posts/create
+	* posts/{post}
+	***/
+```
+
+## 04_index 页面输出
+
+```c
+/*	开胃菜:输出文章列表
+	
+	* 这个是比较简单一些的了,但是并不代表没有东西学
+	* 
+	* 首先引入 Use App\Post  引入和数据库关联的模型
+	* $post = Post::orderBy('created_at','desc')->get();
+	
+	* $post = Post::latest()->get();
+	
+	* 都是按时间排序的哦****/
+
+
+/*	carbon时间转化
+	
+	2017-05-10 18:22:32 这个是默认输出格式
+	
+	-> toFormattedDateString -> May-23-2017
+	* **/
+
+/*	数据填充
+	
+	* 数据库模式的填充,不用手动输入了,直接程序生成,节省开发时间
+	
+	*  ***/
+```
+
+> 参考
+>
+> 1. [carbon文档](http://carbon.nesbot.com/docs/)
+> 2. [数据填充Faker](https://github.com/fzaninotto/Faker)
 
