@@ -1,4 +1,4 @@
-# Laravel 5.5 制作简书--笔记
+# Laravel 5.4 制作简书--笔记
 
 > [慕课网链接](https://coding.imooc.com/class/111.html)
 >
