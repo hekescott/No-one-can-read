@@ -299,11 +299,285 @@ $table->string('title',100) 如何实现
 	
 	* 数据库模式的填充,不用手动输入了,直接程序生成,节省开发时间
 	
-	*  ***/
+	* database -> factories -> ModelFactory.php 
+	
+	* 格式***/
+	
+	$factory->define(App\Post::class,function(Faker\Generator $Faker){
+      return [
+        'title'=> $faker->sentence(6)
+        ....
+      ];
+	})
+      
+    /* 注意: 1.这里面的属性一定是要定义好的哦,没有定义的会报错. **/
+	
+
+/*	分页
+	
+	* 这个是一个常见的功能了
+	
+	* 实现起来贼简单 ****/
+      
+    {{ $posts->links() }}
+
+	/* 完事 */
 ```
 
 > 参考
 >
 > 1. [carbon文档](http://carbon.nesbot.com/docs/)
 > 2. [数据填充Faker](https://github.com/fzaninotto/Faker)
+
+## 05_show 页面输出
+
+```c
+/* 这个就很简单了
+	
+ * 但是有更简单的方法一定要记住***/
+ 
+ // web.php
+
+    Route::get('/post/{post}',PostController@show);
+
+ // PostController.php
+
+	public function show(Post $post)
+    {
+      return view('posts.show',compact('post'));
+    }
+```
+
+## 06_create 页面
+
+```c
+/*	Form属性 name设置
+
+	* name 要和 数据库字段以及migration文件字段一致,方便管理 **/
+
+/*	CSRF调用 	****/
+	
+	// 在form下加入 
+	
+	{{csrf_field()}}
+
+	<input type="hidden" name="_token" value="{{csrf_token}}"/>
+	
+    // 原理
+    
+      
+    /* 这是通过一个网址,来导入数据库的方式,那么就会产生一个问题,可以利用一些手段
+    	
+    	* 命令行,黑客等等方式,实现数据库的大量注入,而不是人为的输入
+    	
+    	* 这就很讨厌了,别管他是不是要干坏事,这至少不是我想看到的.
+    	
+    	* 怎么办呢,进入这个网址之后,我就会生成一个value值,代表这个网页生成了
+    	
+    	* 上传的时候,也必须带这个value值,才能代表你确定是打开这个页面并上传了
+    	
+    	* 这个value有个专业的名字叫_token
+    	
+    	* 不是很专业,大概就是这样.
+    */
+
+  /*  create 方法***/
+      
+      Post::create(request(['title','content']));
+		
+	  /* 注意create方法使用有个小前提,那就是在Post.php 写入 */
+	  
+	  Class Post extends Model
+      {
+      	protected $guarded=[];
+      	protected $filled = ['title','content'];
+      }
+      
+  /*  基类 不是鸡肋哦
+	  	
+	  	* app/Model.php
+	  	*/
+
+		<?php
+
+		namespace App;
+
+		use Illuminate\Database\Eloquent\Model as baseModel;
+
+		class Model extends baseModel
+		{
+		    protected $guarded=[];
+		}
+		
+	 	// Post.php
+		use App\Model 
+		
+		class Post extends Model
+        {
+        
+        }
+        // 现在看是多此一举,以后看看
+        
+/*	表达验证
+	
+	* laravel内置一个超级好用的表单验证 validate */
+	
+		$this->validate(request(),[
+		  'title'=>'required|string|max:100|min:2',
+		  'content'=>'required|string|min:10',
+		]);
+	 * // 注意啦,这个validata,还有一个牛逼的地方,那就是自动传一个$errors到view中
+       // 是的,就是这个牛逼的地方了
+       // 等等还有更牛逼的,加入中文提示
+       
+       $this->validate(request(),[
+		  'title'=>'required|string|max:100|min:2',
+		  'content'=>'required|string|min:10',
+       ],[
+         'title.min'=>'标题太短了'
+       ]);
+
+	 /* 还要自己写,太烦了啊
+	 
+	 	* OK,有不烦的,
+	 	
+	 	* 添加zh文件夹
+	 	* resources->lang->zh->validation.php
+	 	
+	 	* 修改config/app.php 配置
+	 	* app.php->'locale' => 'zh',
+	 **/
+
+/*	总结
+	
+	* 1.验证 validate
+	
+	* 2.逻辑 获取请求+保存
+	
+	* 3.页面跳转(return redirect)  ***/
+```
+
+> 参考:
+>
+> 1.[5.4表单验证](https://d.laravel-china.org/docs/5.4/validation)
+>
+> 2.[5.4 validate中文提示](https://gist.github.com/linkdesu/994b59c8dc6217dd299a)
+
+## 07_wangeditor
+
+```c
+/*	Wangeditor
+
+	* 文本编辑器不够漂亮,问啥不来试试 "wang"呢
+	
+	* 支持国产,从我做起,aha~
+	
+	**/
+
+/*	wangEditor 2.1.23
+
+	* 先来测试 V2 版本
+
+	* 复制dist->js&css&fonts->min.css 到 public->js & css& fonts
+	
+	* 新建一个js,命名为ylaravel.js,这个名字命的垃圾,wangeditorConfig.js 
+
+	* 这些文件同时在main.blade.php中引入
+	
+	* 格式为/css/min.css  /js/min.js  需求jquery+wangeditor.js+ylaravel.js */
+
+	// 这里需要注意的是 要把textarea标签的id 和这个 new wangEditor('id') 对应起来
+		
+		// create.blade.php 写法
+
+		<textarea id="content" 
+          		  style="height: 400px; max-height: 500px;" 
+          		  name="content" 
+          		  class="form-control" 
+          		  placeholder="这里是内容"
+        ></textarea>
+        
+          
+		// wangeditorConfig.js 引入
+		var editor = new wangEditor('content');
+
+		editor.config.uploadImgUrl = '/posts/image/upload';
+
+		// 设置 headers（举例）
+		editor.config.uploadHeaders = {
+    	  'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')
+		};
+
+		editor.create();
+	
+
+/*	测试
+	
+	* 完成上述步骤后,可以刷新页面了
+	
+	* 完了,你发现里面输出的都是html
+	
+	* 这是正常的,那么我应用肯定是把这些html格式化啊,肯定不能输出源码啊,
+	
+	* 看我的**/
+	<p>{{ str_limit($post->content),100,'...' }}</p>
+	
+	->
+      
+    {!! str_limit($post->content),100,'...' !!}
+
+	Bingo!
+      
+ /*	重头戏:图片上传
+      
+    * 完成这个才叫完美
+    
+    * 图片上传本质上也是一个表单提交 */
+    
+    // 在ylaravel.js中添加 
+    
+      editor.config.uploadImgUrl = '/posts/image/upload';
+
+   /* 这个是用来设置,图片上传的地址的
+	
+    * 有了地址,我们就需要路由 */
+     
+    //  在web.php中 添加
+    Route::post('/posts/image/upload','PostController@imgUpload');
+
+	// post那就必须有个token,
+	
+    // main.blade.php 写入
+	
+	
+	// ylaravel.js 设置 headers（举例）
+	editor.config.uploadHeaders = {
+    	'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')
+	};
+
+	// 对图片进行储存 储存地址
+	storage->app->public
+	
+	// 修改配置,关联文件夹
+	filesystems.php->'default' => env('FILESYSTEM_DRIVER', 'public'),
+
+    // 加入公开磁盘
+    php artisan storage:link
+    
+    // 对PostController进行修改
+    public function imageUpload(Request $request)
+    {
+      $path = $request->file('wangEditorH5File')->storePublicly(md5(time()));
+      return asset('storage/'. $path);
+    }
+
+	// 真是意想不到的错误,一个简单的post网址请求,我居然错了两次,不敢相信啊
+
+```
+
+> 参考
+>
+> 1. [wangeditor](www.wangeditor.com)
+>
+> 2. [X-XSRF-TOKEN](https://d.laravel-china.org/docs/5.4/csrf#csrf-x-xsrf-token)
 
